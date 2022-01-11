@@ -70,6 +70,17 @@ runner = dict(
     type='ActnnEpochRunner', max_epochs=100,
 )
 
+# Precise BN hook will update the bn stats, so this hook should be executed
+# before CheckpointHook, which has priority of 'NORMAL'. So set the
+# priority of PreciseBNHook to 'ABOVE_NORMAL' here.
+custom_hooks = [
+    dict(
+        type='PreciseBNHook',
+        num_samples=8192,
+        interval=1,
+        priority='ABOVE_NORMAL')
+]
+
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
 load_from = None
@@ -87,7 +98,7 @@ log_config = dict(
             init_kwargs=dict(
                 project='mim',
                 entity='actnn',
-                name='classification_resnet50_b64x4_imagenet',
+                name='classification_resnet50_b64x4_imagenet PreciseBN',
             )
         )
     ]
